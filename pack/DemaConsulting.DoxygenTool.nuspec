@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+    <metadata>
+        <id>DemaConsulting.DoxygenTool</id>
+        <version>0.0.0</version>
+        <title>Doxygen Dotnet Tool</title>
+        <authors>Dema Consulting</authors>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <license type="expression">GPL-2.0-or-later</license>
+        <readme>docs/README.md</readme>
+        <icon>docs/Icon.png</icon>
+        <projectUrl>https://github.com/demaconsulting/DoxygenTool</projectUrl>
+        <description>Dotnet Tool Wrapper for Doxygen</description>
+        <copyright>Dema Consulting</copyright>
+        <tags>doxygen</tags>
+        <repository type="git" url="https://github.com/demaconsulting/DoxygenTool.git" />
+        <packageTypes>
+            <packageType name="DotnetTool" />
+        </packageTypes>
+    </metadata>
+    <files>
+        <file src="../README.md" target="docs/README.md" />
+        <file src="../Icon.png" target="docs/Icon.png" />
+        <file src="docs/**/*" target="docs" />
+        <file src="tools/**/*" target="tools" />
+    </files>
+</package>

@@ -1,0 +1,8 @@
+{
+  "win-x64": {
+    "program": "win-x64/doxygen.exe"
+  },
+  "linux-x64": {
+    "program": "linux-x64/doxygen"
+  }
+}
