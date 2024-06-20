@@ -69,32 +69,33 @@ jobs:
         cp doxygen-linux-x64/*/VERSION pack/docs
         cp doxygen-linux-x64/*/*.pdf pack/docs
 
-  - name: Generate SBOM
-    run: >
-      dotnet sbom-tool generate
-      -b pack
-      -pn DemaConsulting.DoxygenTool
-      -pv ${{ inputs.semver }}
-      -ps DemaConsulting
-      -nsb https://DemaConsulting.com/DoxygenTool
+    - name: Generate SBOM
+      run: >
+        dotnet sbom-tool generate
+        -b pack
+        -pn DemaConsulting.DoxygenTool
+        -pv ${{ inputs.semver }}
+        -ps DemaConsulting
+        -nsb https://DemaConsulting.com/DoxygenTool
 
-  - name: Enhance SBOM
-    shell: bash
-    run: |
-      DOX=${{ inputs.doxygen }}
-      DOXU=${DOX//./_}
-      
-      dotnet spdx-tool run-workflow spdx-workflow.yaml doxygen-version=${{ inputs.doxygen }} doxygen-version_tag=${DOXU}
+    - name: Enhance SBOM
+      shell: bash
+      run: |
+        DOX=${{ inputs.doxygen }}
+        DOXU=${DOX//./_}
+        
+        dotnet spdx-tool run-workflow spdx-workflow.yaml doxygen-version=${{ inputs.doxygen }} doxygen-version_tag=${DOXU}
 
-  - name: Create Dotnet Tool
-    run: |
-      cd pack
-      nuget pack -Version ${{ inputs.version }}
+    - name: Create Dotnet Tool
+      run: |
+        cd pack
+        nuget pack -Version ${{ inputs.version }}
 
-  - name: Upload Artifacts
-    uses: actions/upload-artifact@v4
-    with:
-      name: build-artifacts
-      path: |
-        pack/*.nupkg
-        pack/_manifest/spdx_2.2/*.*
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-artifacts
+        path: |
+          pack/*.nupkg
+          pack/_manifest/spdx_2.2/*.*
+    
