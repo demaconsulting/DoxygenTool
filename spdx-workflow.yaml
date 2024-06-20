@@ -1,0 +1,116 @@
+# This workflow annotates the SBOM for the DemaConsulting.DoxygenTool with
+# build tools, and generates a summary markdown.
+
+
+# Workflow Parameters
+parameters:
+  spdx: pack/_manifest/spdx_2.2/manifest.spdx.json
+  md: pack/_manifest/spdx_2.2/sbom_summary.md
+  wrapper-spdx: manifest.spdx.json
+  doxygen-version: 0.0.0
+  doxygen-version_tag: "0_0_0"
+
+# Steps
+steps:
+
+  # Rename the Root Package ID
+- command: rename-id
+  displayName: Rename DoxygenTool Package ID
+  inputs:
+    spdx: ${{ spdx }}
+    old: SPDXRef-RootPackage
+    new: SPDXRef-DemaConsulting-DoxygenTool
+
+
+  # Copy DotnetToolWrapper
+- command: copy-package
+  inputs:
+    from: ${{ wrapper-spdx }}
+    to: ${{ spdx }}
+    package: SPDXRef-DemaConsulting-DotnetToolWrapper
+    recursive: true
+    relationships:
+    - type: CONTAINED_BY
+      element: SPDXRef-DemaConsulting-DoxygenTool
+      comment: DotnetToolWrapper embedded into DemaConsulting.DoxygenTool 
+
+
+  # Add Doxygen Package
+- command: add-package
+  inputs:
+    spdx: ${{ spdx }}
+    package:
+      id: SPDXRef-Package-Doxygen-${{ doxygen-version }}
+      name: Doxygen
+      download: NOASSERTION
+      version: ${{ doxygen-version }}
+      filename: NOASSERTION
+      supplier: NOASSERTION
+      originator: NOASSERTION
+      homepage: https://www.doxygen.nl/
+      copyright: "Copyright (C) 1989, 1991 Free Software Foundation, Inc.,"
+      summary: "Doxygen is a documentation generator and static analysis tool for software source trees."
+      license: GPL-2.0-only
+      purl: pkg:github/doxygen/doxygen@Release_${{ doxygen-version_tag }}
+    relationships:
+    - type: CONTAINED_BY
+      element: SPDXRef-DemaConsulting-DoxygenTool
+      comment: Doxygen ${{ doxygen-version }} embedded into DemaConsulting.DoxygenTool 
+
+
+  # Query the version of nuget
+- command: run-workflow
+  displayName: Query Nuget Version
+  inputs:
+    url: https://raw.githubusercontent.com/demaconsulting/SpdxWorkflows/main/GetNugetVersion.yaml
+    outputs:
+      version: nuget-version
+
+
+  # Add Nuget Package
+- command: run-workflow
+  displayName: Add Nuget Package
+  inputs:
+    url: https://raw.githubusercontent.com/demaconsulting/SpdxWorkflows/main/AddNugetPackage.yaml
+    parameters:
+      spdx: ${{ spdx }}
+      version: ${{ nuget-version }}
+      id: SPDXRef-Package-Nuget-${{ nuget-version }}
+
+
+  # Add Nuget Relationship
+- command: add-relationship
+  displayName: Add Nuget Relationship
+  inputs:
+    spdx: ${{ spdx }}
+    id: SPDXRef-Package-Nuget-${{ nuget-version }}
+    relationships:
+    - type: BUILD_TOOL_OF
+      element: SPDXRef-DemaConsulting-DoxygenTool
+      comment: Nuget ${{ nuget-version }} used to package DemaConsulting.DoxygenTool
+
+
+  # Update the SBOM sha256
+- command: hash
+  displayName: Update DoxygenTool SBOM sha256
+  inputs:
+    operation: generate
+    algorithm: sha256
+    file: ${{ spdx }}
+
+
+  # Validate the SBOM
+- command: validate
+  displayName: Validate DoxygenTool SBOM
+  inputs:
+    spdx: ${{ spdx }}
+    ntia: true
+
+
+  # Generate the library summary
+- command: to-markdown
+  displayName: Generate DoxygenTool SBOM summary
+  inputs:
+    spdx: ${{ spdx }}
+    markdown: ${{ md }}
+    title: DoxygenTool

@@ -4,50 +4,9 @@ on: [push]
 
 jobs:
   build:
-  
-    runs-on: ubuntu-latest
-
-    steps:
-
-      - uses: actions/checkout@v4
-
-      - uses: nuget/setup-nuget@v2
-        with:
-          nuget-version: '6.x'
-
-      - name: Insert Wrapper
-        run: |
-          wget https://github.com/demaconsulting/DotnetToolWrapper/releases/download/1.0.0/DotnetToolWrapper.zip
-          unzip -o DotnetToolWrapper.zip -d pack/tools/net6.0/any
-
-      - name: Insert Doxygen win-x64
-        run: |
-          wget https://github.com/doxygen/doxygen/releases/download/Release_1_10_0/doxygen-1.10.0.windows.x64.bin.zip -O doxygen-win-x64.zip
-          mkdir doxygen-win-x64
-          unzip doxygen-win-x64.zip -d doxygen-win-x64
-          mkdir pack/tools/net6.0/any/win-x64
-          cp doxygen-win-x64/doxygen.exe pack/tools/net6.0/any/win-x64
-          cp doxygen-win-x64/libclang.dll pack/tools/net6.0/any/win-x64
-
-      - name: Insert Doxygen linux-x64
-        run: |
-          wget https://github.com/doxygen/doxygen/releases/download/Release_1_10_0/doxygen-1.10.0.linux.bin.tar.gz -O doxygen-linux-x64.tar.gz
-          mkdir doxygen-linux-x64
-          tar -xzvf doxygen-linux-x64.tar.gz -C doxygen-linux-x64
-          mkdir pack/tools/net6.0/any/linux-x64
-          cp doxygen-linux-x64/*/bin/doxygen pack/tools/net6.0/any/linux-x64
-          mkdir pack/docs
-          cp doxygen-linux-x64/*/LICENSE pack/docs
-          cp doxygen-linux-x64/*/VERSION pack/docs
-          cp doxygen-linux-x64/*/*.pdf pack/docs
-
-      - name: Create Dotnet Tool
-        run: |
-          cd pack
-          nuget pack
-
-      - name: Upload asset
-        uses: actions/upload-artifact@v4
-        with:
-          name: DoxygenTool
-          path: pack/*.nupkg
+    name: Build Artifacts
+    uses: ./.github/workflows/build.yaml
+    with:
+      wrapper: 1.1.0
+      doxygen: 1.11.0
+      version: 0.0.0-run.${{ github.run_number }}
