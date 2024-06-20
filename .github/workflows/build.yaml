@@ -74,7 +74,7 @@ jobs:
         dotnet sbom-tool generate
         -b pack
         -pn DemaConsulting.DoxygenTool
-        -pv ${{ inputs.semver }}
+        -pv ${{ inputs.version }}
         -ps DemaConsulting
         -nsb https://DemaConsulting.com/DoxygenTool
 
