@@ -77,6 +77,8 @@ jobs:
         -pv ${{ inputs.version }}
         -ps DemaConsulting
         -nsb https://DemaConsulting.com/DoxygenTool
+        -li true
+        -pm true
 
     - name: Enhance SBOM
       shell: bash

@@ -13,13 +13,22 @@ parameters:
 # Steps
 steps:
 
+  # Get the DoxygenTool version
+- command: get-version
+  displayName: Get DoxygenTool Version
+  inputs:
+    output: doxygentool-version
+    spdx: ${{ spdx }}
+    name: DemaConsulting.DoxygenTool
+
+
   # Rename the Root Package ID
 - command: rename-id
   displayName: Rename DoxygenTool Package ID
   inputs:
     spdx: ${{ spdx }}
     old: SPDXRef-RootPackage
-    new: SPDXRef-DemaConsulting-DoxygenTool
+    new: SPDXRef-DemaConsulting-DoxygenTool-${{ doxygentool-version }}
 
 
   # Copy DotnetToolWrapper
@@ -31,7 +40,7 @@ steps:
     recursive: true
     relationships:
     - type: CONTAINED_BY
-      element: SPDXRef-DemaConsulting-DoxygenTool
+      element: SPDXRef-DemaConsulting-DoxygenTool-${{ doxygentool-version }}
       comment: DotnetToolWrapper embedded into DemaConsulting.DoxygenTool 
 
 
@@ -54,7 +63,7 @@ steps:
       purl: pkg:github/doxygen/doxygen@Release_${{ doxygen-version_tag }}
     relationships:
     - type: CONTAINED_BY
-      element: SPDXRef-DemaConsulting-DoxygenTool
+      element: SPDXRef-DemaConsulting-DoxygenTool-${{ doxygentool-version }}
       comment: Doxygen ${{ doxygen-version }} embedded into DemaConsulting.DoxygenTool 
 
 
@@ -86,7 +95,7 @@ steps:
     id: SPDXRef-Package-Nuget-${{ nuget-version }}
     relationships:
     - type: BUILD_TOOL_OF
-      element: SPDXRef-DemaConsulting-DoxygenTool
+      element: SPDXRef-DemaConsulting-DoxygenTool-${{ doxygentool-version }}
       comment: Nuget ${{ nuget-version }} used to package DemaConsulting.DoxygenTool
 
 
