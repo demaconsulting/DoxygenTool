@@ -4,77 +4,68 @@ on:
   workflow_dispatch:
     inputs:
       wrapper:
-        description: 'Wrapper version (1.0.0)'
+        description: 'Wrapper version (1.1.0)'
         required: true
       doxygen:
-        description: 'Doxygen version (1.10.0)'
+        description: 'Doxygen version (1.11.0)'
         required: true
       version:
-        description: 'Release version (1.10.0.1)'
+        description: 'Release version (1.11.0.1)'
         required: true
+      publish:
+        description: 'Release Type'
+        required: true
+        default: 'publish'
+        type: choice
+        options:
+        - none
+        - release
+        - publish
 
 jobs:
+  build:
+    name: Build Artifacts
+    uses: ./.github/workflows/build.yaml
+    with:
+      wrapper: ${{ inputs.wrapper }}
+      doxygen: ${{ inputs.doxygen }}
+      version: ${{ inputs.version }}
+
   release:
-  
     permissions:
       contents: write
       packages: write
 
     runs-on: ubuntu-latest
-    
+
+    needs: build
+
     steps:
     
-      - uses: actions/checkout@v4
+    - uses: actions/checkout@v4
 
-      - uses: nuget/setup-nuget@v2
-        with:
-          nuget-version: '6.x'
+    - uses: nuget/setup-nuget@v2
+      with:
+        nuget-version: '6.x'
 
-      - name: Insert Wrapper
-        run: |
-          wget https://github.com/demaconsulting/DotnetToolWrapper/releases/download/${{ github.event.inputs.wrapper }}/DotnetToolWrapper.zip
-          unzip -o DotnetToolWrapper.zip -d pack/tools/net6.0/any
+    - name: Download Artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: build-artifacts
+        path: build-artifacts
 
-      - name: Insert Doxygen win-x64
-        run: |
-          DOX=${{ github.event.inputs.doxygen }}
-          DOXU=${DOX//./_}
-          wget https://github.com/doxygen/doxygen/releases/download/Release_${DOXU}/doxygen-${{ github.event.inputs.doxygen }}.windows.x64.bin.zip -O doxygen-win-x64.zip
-          mkdir doxygen-win-x64
-          unzip doxygen-win-x64.zip -d doxygen-win-x64
-          mkdir pack/tools/net6.0/any/win-x64
-          cp doxygen-win-x64/doxygen.exe pack/tools/net6.0/any/win-x64
-          cp doxygen-win-x64/libclang.dll pack/tools/net6.0/any/win-x64
+    - name: Create release
+      if: ${{ inputs.publish == 'release' || inputs.publish == 'publish' }}
+      uses: ncipollo/release-action@v1
+      with:
+        artifacts: "build-artifacts/*.nupkg,build-artifacts/_manifest/spdx_2.2/*.*"
+        generateReleaseNotes: true
+        tag: ${{ inputs.version }}
 
-      - name: Insert Doxygen linux-x64
-        run: |
-          DOX=${{ github.event.inputs.doxygen }}
-          DOXU=${DOX//./_}
-          wget https://github.com/doxygen/doxygen/releases/download/Release_${DOXU}/doxygen-${{ github.event.inputs.doxygen }}.linux.bin.tar.gz -O doxygen-linux-x64.tar.gz
-          mkdir doxygen-linux-x64
-          tar -xzvf doxygen-linux-x64.tar.gz -C doxygen-linux-x64
-          mkdir pack/tools/net6.0/any/linux-x64
-          cp doxygen-linux-x64/*/bin/doxygen pack/tools/net6.0/any/linux-x64
-          mkdir pack/docs
-          cp doxygen-linux-x64/*/LICENSE pack/docs
-          cp doxygen-linux-x64/*/VERSION pack/docs
-          cp doxygen-linux-x64/*/*.pdf pack/docs
-
-      - name: Create Dotnet Tool
-        run: |
-          cd pack
-          nuget pack -Version ${{ github.event.inputs.version }}
-
-      - name: Create release
-        uses: ncipollo/release-action@v1
-        with:
-          artifacts: pack/*.nupkg
-          generateReleaseNotes: true
-          tag: ${{ github.event.inputs.version }}
-
-      - name: Publish to Nuget
-        run: >
-          dotnet nuget push
-          pack/*.nupkg
-          --source "https://api.nuget.org/v3/index.json"
-          --api-key "${{ secrets.DEMACONSULTINGNUGETKEY }}"
+    - name: Publish to Nuget
+      if: ${{ inputs.publish == 'publish' }}
+      run: >
+        dotnet nuget push
+        build-artifacts/*.nupkg
+        --source "https://api.nuget.org/v3/index.json"
+        --api-key "${{ secrets.DEMACONSULTINGNUGETKEY }}"

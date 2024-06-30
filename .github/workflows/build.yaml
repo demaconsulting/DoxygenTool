@@ -1,0 +1,103 @@
+on:
+  workflow_call:
+    inputs:
+      wrapper:
+        required: true
+        type: string
+      doxygen:
+        required: true
+        type: string
+      version:
+        required: true
+        type: string
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    
+    - uses: actions/checkout@v4
+
+    - name: Setup dotnet 6/8
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: |
+          6.x
+          8.x          
+
+    - uses: nuget/setup-nuget@v2
+      with:
+        nuget-version: '6.x'
+
+    - name: Restore Tools
+      run: >
+        dotnet tool restore
+
+    - name: Insert Wrapper
+      shell: bash
+      run: |
+        wget https://github.com/demaconsulting/DotnetToolWrapper/releases/download/${{ inputs.wrapper }}/manifest.spdx.json
+        wget https://github.com/demaconsulting/DotnetToolWrapper/releases/download/${{ inputs.wrapper }}/DotnetToolWrapper.zip
+        unzip -o DotnetToolWrapper.zip -d DotnetToolWrapper
+        cp DotnetToolWrapper/net6.0/*.* pack/tools/net6.0/any
+        cp DotnetToolWrapper/net8.0/*.* pack/tools/net8.0/any
+
+    - name: Insert Doxygen win-x64
+      shell: bash
+      run: |
+        DOX=${{ inputs.doxygen }}
+        DOXU=${DOX//./_}
+        wget https://github.com/doxygen/doxygen/releases/download/Release_${DOXU}/doxygen-${{ inputs.doxygen }}.windows.x64.bin.zip -O doxygen-win-x64.zip
+        mkdir doxygen-win-x64
+        unzip doxygen-win-x64.zip -d doxygen-win-x64
+        mkdir pack/win-x64
+        cp doxygen-win-x64/doxygen.exe pack/win-x64
+        cp doxygen-win-x64/libclang.dll pack/win-x64
+
+    - name: Insert Doxygen linux-x64
+      shell: bash
+      run: |
+        DOX=${{ inputs.doxygen }}
+        DOXU=${DOX//./_}
+        wget https://github.com/doxygen/doxygen/releases/download/Release_${DOXU}/doxygen-${{ inputs.doxygen }}.linux.bin.tar.gz -O doxygen-linux-x64.tar.gz
+        mkdir doxygen-linux-x64
+        tar -xzvf doxygen-linux-x64.tar.gz -C doxygen-linux-x64
+        mkdir pack/linux-x64
+        cp doxygen-linux-x64/*/bin/doxygen pack/linux-x64
+        mkdir pack/docs
+        cp doxygen-linux-x64/*/LICENSE pack/docs
+        cp doxygen-linux-x64/*/VERSION pack/docs
+        cp doxygen-linux-x64/*/*.pdf pack/docs
+
+    - name: Generate SBOM
+      run: >
+        dotnet sbom-tool generate
+        -b pack
+        -pn DemaConsulting.DoxygenTool
+        -pv ${{ inputs.version }}
+        -ps DemaConsulting
+        -nsb https://DemaConsulting.com/DoxygenTool
+        -li true
+        -pm true
+
+    - name: Enhance SBOM
+      shell: bash
+      run: |
+        DOX=${{ inputs.doxygen }}
+        DOXU=${DOX//./_}
+        
+        dotnet spdx-tool run-workflow spdx-workflow.yaml doxygen-version=${{ inputs.doxygen }} doxygen-version_tag=${DOXU}
+
+    - name: Create Dotnet Tool
+      run: |
+        cd pack
+        nuget pack -Version ${{ inputs.version }}
+
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-artifacts
+        path: |
+          pack/*.nupkg
+          pack/_manifest/spdx_2.2/*.*
+    
