@@ -13,7 +13,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
     
     - uses: actions/checkout@v4
@@ -27,7 +27,7 @@ jobs:
 
     - uses: nuget/setup-nuget@v2
       with:
-        nuget-version: '6.x'
+        nuget-version: latest
 
     - name: Restore Tools
       run: >
