@@ -7,6 +7,6 @@ jobs:
     name: Build Artifacts
     uses: ./.github/workflows/build.yaml
     with:
-      wrapper: 1.1.0
-      doxygen: 1.12.0
+      wrapper: 1.2.0
+      doxygen: 1.15.0
       version: 0.0.0-run.${{ github.run_number }}
