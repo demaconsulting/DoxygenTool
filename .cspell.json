@@ -1,0 +1,36 @@
+{
+  "version": "0.2",
+  "language": "en",
+  "words": [
+    "demaconsulting",
+    "doxygen",
+    "dotnet",
+    "nuget",
+    "nupkg",
+    "csproj",
+    "nuspec",
+    "sbom",
+    "spdx",
+    "libclang",
+    "DEMA",
+    "Dema",
+    "Dotnet",
+    "linux",
+    "win",
+    "netstandard",
+    "workflows",
+    "dependabot",
+    "markdownlint",
+    "cspell"
+  ],
+  "ignorePaths": [
+    "node_modules",
+    ".git",
+    "*.nupkg",
+    "pack/tools",
+    "pack/win-x64",
+    "pack/linux-x64",
+    "pack/docs",
+    "pack/_manifest"
+  ]
+}

@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 💬 Discussions
+    url: https://github.com/demaconsulting/DoxygenTool/discussions
+    about: Ask questions and discuss ideas with the community
+  - name: 📖 Documentation
+    url: https://github.com/demaconsulting/DoxygenTool/blob/main/README.md
+    about: View the project documentation
