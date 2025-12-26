@@ -58,4 +58,3 @@ This project is licensed under the GPL-2.0-or-later License - see the [LICENSE][
 [code-of-conduct]: https://github.com/demaconsulting/DoxygenTool/blob/main/CODE_OF_CONDUCT.md
 [security]: https://github.com/demaconsulting/DoxygenTool/blob/main/SECURITY.md
 [license]: https://github.com/demaconsulting/DoxygenTool/blob/main/LICENSE
-

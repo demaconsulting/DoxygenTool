@@ -4,6 +4,7 @@
   "words": [
     "demaconsulting",
     "doxygen",
+    "doxygentool",
     "dotnet",
     "nuget",
     "nupkg",
@@ -21,7 +22,9 @@
     "workflows",
     "dependabot",
     "markdownlint",
-    "cspell"
+    "cspell",
+    "NOASSERTION",
+    "ntia"
   ],
   "ignorePaths": [
     "node_modules",
