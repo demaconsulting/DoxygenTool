@@ -98,6 +98,8 @@ jobs:
           pack/_manifest/spdx_2.2/*.*
 
   test:
+    permissions:
+      contents: read
     runs-on: ${{ matrix.os }}
     needs: build
     strategy:
