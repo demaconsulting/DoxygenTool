@@ -63,6 +63,18 @@ When making changes to the tool wrapper or build process:
 2. Verify the generated NuGet package
 3. Test the tool installation and execution
 
+#### Automated CI Testing
+
+All pull requests and pushes trigger automated testing via GitHub Actions:
+
+* **Quality Checks**: Spelling and markdown linting
+* **Build**: Creates the NuGet package on ubuntu-latest
+* **Package Testing**: Matrix tests across:
+  * Operating Systems: ubuntu-latest, windows-latest
+  * .NET Versions: 8.x, 9.x, 10.x
+
+The package tests verify the tool can be installed and executed by running `doxygen --help` and `doxygen --version`.
+
 ### Commit Messages
 
 * Use clear and descriptive commit messages

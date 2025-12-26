@@ -42,6 +42,21 @@ When making changes:
 4. For build-related changes, test the full build process
 5. For documentation changes, verify all links are absolute URLs (especially in README.md)
 
+### CI Testing
+
+The project uses automated CI testing in `.github/workflows/build.yaml`:
+
+1. **Build Job**: Builds the NuGet package on ubuntu-latest
+2. **Test Job**: Matrix tests the built package across:
+   * Operating Systems: ubuntu-latest, windows-latest
+   * .NET Versions: 8.x, 9.x, 10.x
+
+The test job verifies that the packaged Doxygen tool can be installed and executed correctly by:
+
+* Installing the tool as a local .NET tool
+* Running `doxygen --help` to verify basic functionality
+* Running `doxygen --version` to verify version information
+
 ## Build Process
 
 The project uses a multi-stage build process:
