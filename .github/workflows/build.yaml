@@ -96,4 +96,52 @@ jobs:
         path: |
           pack/*.nupkg
           pack/_manifest/spdx_2.2/*.*
+
+  test:
+    runs-on: ${{ matrix.os }}
+    needs: build
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        dotnet: ['8.x', '9.x', '10.x']
+    steps:
+    
+    - name: Setup dotnet
+      uses: actions/setup-dotnet@v5
+      with:
+        dotnet-version: ${{ matrix.dotnet }}
+
+    - name: Download Artifacts
+      uses: actions/download-artifact@v5
+      with:
+        name: build-artifacts
+        path: build-artifacts
+
+    - name: Create test directory
+      shell: bash
+      run: mkdir test-dir
+
+    - name: Create tool manifest
+      shell: bash
+      run: |
+        cd test-dir
+        dotnet new tool-manifest
+
+    - name: Install DoxygenTool
+      shell: bash
+      run: |
+        cd test-dir
+        dotnet tool install DemaConsulting.DoxygenTool --add-source ../build-artifacts --version ${{ inputs.version }}
+
+    - name: Run doxygen --help
+      shell: bash
+      run: |
+        cd test-dir
+        dotnet tool run doxygen -- --help
+
+    - name: Verify doxygen version
+      shell: bash
+      run: |
+        cd test-dir
+        dotnet tool run doxygen -- --version
     
