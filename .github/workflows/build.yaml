@@ -43,7 +43,7 @@ jobs:
       run: |
         DOX=${{ inputs.doxygen }}
         DOXU=${DOX//./_}
-        wget https://github.com/doxygen/doxygen/releases/download/Release_${DOXU}/doxygen-${{ inputs.doxygen }}.windows.x64.bin.zip -O doxygen-win-x64.zip
+        wget https://github.com/doxygen/doxygen/releases/download/Release_${DOXU}/doxygen-${{ inputs.doxygen }}.x64.bin.zip -O doxygen-win-x64.zip
         mkdir doxygen-win-x64
         unzip doxygen-win-x64.zip -d doxygen-win-x64
         mkdir pack/win-x64
@@ -62,7 +62,6 @@ jobs:
         cp doxygen-linux-x64/*/bin/doxygen pack/linux-x64
         mkdir pack/docs
         cp doxygen-linux-x64/*/LICENSE pack/docs
-        cp doxygen-linux-x64/*/VERSION pack/docs
         cp doxygen-linux-x64/*/*.pdf pack/docs
 
     - name: Generate SBOM
