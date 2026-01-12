@@ -62,7 +62,6 @@ jobs:
         cp doxygen-linux-x64/*/bin/doxygen pack/linux-x64
         mkdir pack/docs
         cp doxygen-linux-x64/*/LICENSE pack/docs
-        cp doxygen-linux-x64/*/VERSION pack/docs
         cp doxygen-linux-x64/*/*.pdf pack/docs
 
     - name: Generate SBOM
